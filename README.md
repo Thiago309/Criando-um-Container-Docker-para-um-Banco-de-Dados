@@ -30,7 +30,7 @@ docker run --name engineer_dw -p 5437:5432 -e POSTGRES_USER=engineer_user -e POS
 | `-d` | Roda o contêiner em segundo plano, liberando o terminal. |
 | `postgres:18-alpine` | Utiliza a versão 18 do PostgreSQL em uma distribuição Linux super leve (Alpine). |
 
-> **⚠️ Atenção:** Este comando provisiona o banco sem um volume persistente mapeado. Isso significa que, se o contêiner for apagado, os dados gravados no banco `db_engineer` serão perdidos. Perfeito para laboratórios e testes da formação.
+> **⚠️ Atenção:** Este comando provisiona o banco sem um volume persistente mapeado. Isso significa que, se o contêiner for apagado, os dados gravados no banco `db_engineer` serão perdidos. Perfeito para laboratórios e testes da formação. Caso você deseje ativar o mapeamento de volume de dados, adicione o seguinte comando logo após do (-e POSTGRES_DB=db_engineer) -v dsadata_volume:/var/lib/postgresql/data 
 
 ---
 
