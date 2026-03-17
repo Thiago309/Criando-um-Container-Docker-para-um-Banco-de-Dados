@@ -64,6 +64,7 @@ having ROUND(AVG(salario), 2) > 20000
 order by departamento;
 
 
+select * from funcionarios
 
 
 
