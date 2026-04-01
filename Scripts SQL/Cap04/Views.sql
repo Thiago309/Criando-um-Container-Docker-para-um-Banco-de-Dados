@@ -87,7 +87,7 @@ where f.salario > sd.salario_medio;
 
 
 -- Visualiza os dados
-SELECT * FROM engineer04.vw_detalhes_funcionarios
+SELECT * from engineer04.vw_detalhes_funcionarios
 
 
 -- View para retornar funcionários alocados em projetos
@@ -109,10 +109,105 @@ select * from FuncionariosProjetos;
 
 
 -- Visualiza os dados
-SELECT * FROM engineer04.vw_funcionarios_projetos
+SELECT * from engineer04.vw_funcionarios_projetos
 
 
 
 -- 							[VIEWS MATERALIZADAS]
+
+-- Materialized View para retornar funcionários alocados em projetos
+create materialized view engineer04.mv_funcionarios_projetos as
+with FuncionariosProjetos as (
+    select 
+        f.id_funcionario,
+        f.nome as nome_funcionario,
+        f.departamento,
+        f.salario,
+        coalesce(p.id_projeto, 0) as id_projeto,
+        coalesce(p.nome_projeto, 'NA') as nome_projeto
+    from 
+        engineer04.funcionarios f
+    left join 
+        engineer04.projetos p on f.id_funcionario = p.func_id
+)
+select * from FuncionariosProjetos;
+
+
+-- Visualiza os dados (VIEW MATERALIZADA)
+select * from engineer04.mv_funcionarios_projetos
+
+-- Visualiza os dados (VIEW)
+select * from engineer04.vw_funcionarios_projetos
+
+
+-- Visualiza os dados (VIEW MATERALIZADA) -> Executa uma consulta. (Temporaria)
+explain select * from engineer04.mv_funcionarios_projetos
+
+-- Visualiza os dados (VIEW) com EXPLAIN -> Executa uma tabela.    (Gera na máquina)
+explain select * from engineer04.vw_funcionarios_projetos
+
+-- Inserindo mais um funcionário
+insert into engineer04.funcionarios (id_funcionario, nome, departamento, data_contratacao, salario)
+values (105, 'cora coralina', 'analytics engineer - dsa', '2024-03-13', 29700.00);
+
+
+-- Visualiza os dados (VIEW MATERALIZADA)
+select * from engineer04.mv_funcionarios_projetos
+
+-- Visualiza os dados (VIEW)
+select * from engineer04.vw_funcionarios_projetos
+
+
+-- Refresh - Atualiza os novos dados na VIEW MATERALIZADA antiga.
+refresh materialized view engineer04.mv_funcionarios_projetos;
+
+
+-- 							[STORAGE PROCEDURE]
+
+-- SP que retorna o salário de cada funcionário com aumento de 5%
+create or replace procedure engineer04.aumenta_salario()
+language plpgsql	-- Indica o tipo de linguagem de programação de banco de dados a ser utilizada. Neste caso o plpgsql para o postegree.
+as $$
+declare 
+    cur cursor for select id_funcionario, nome, salario, salario * 1.05 as salario_novo from engineer04.funcionarios;
+begin
+    for record in cur loop
+        raise notice 'funcionario: %, salario atual: %, novo salario: %', 
+                     record.nome, record.salario, record.salario_novo;
+    end loop;
+end;
+$$;
+
+
+-- Executa a SP criada anteriormente.
+CALL engineer04.aumenta_salario();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
