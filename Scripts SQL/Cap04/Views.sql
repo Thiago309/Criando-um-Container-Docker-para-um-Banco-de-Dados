@@ -221,13 +221,42 @@ for each row execute function engineer04.verifica_funcionario_projeto();
 insert into engineer04.projetos (id_projeto, nome_projeto, func_id)
 values (6008, 'Pipeline de Integração de Dados', null);
 
+-- Cria tabela para auditoria
+create table engineer04.historico_salarios (
+    id_funcionario int,
+    salario_antigo decimal(10, 2),
+    data_mudanca   timestamp default current_timestamp
+);
 
+-- Function
+create or replace function engineer04.salva_salario_antigo()
+returns trigger as $$
+begin
+    -- Insere o salário antigo na tabela historico_salarios
+    if old.salario is distinct from new.salario then
+        insert into engineer04.historico_salarios (id_funcionario, salario_antigo)
+        values (old.id_funcionario, old.salario);
+    end if;
+    return new;
+end;
+$$ language plpgsql;
 
+-- Trigger para função anterior
+create trigger trg_salva_salario_antigo
+before update on engineer04.funcionarios
+for each row execute function engineer04.salva_salario_antigo();
 
+-- Testando Trigger salva_salario_antigo
+-- Verificando o valor antes da atualização do salario
+select * from engineer04.funcionarios
 
+-- Atualização de dados
+update engineer04.funcionarios 
+set salario = 36500.00 
+where nome = 'Machado de Assis';
 
-
-
+-- Verifica os dados
+select * from engineer04.historico_salarios;
 
 
 
