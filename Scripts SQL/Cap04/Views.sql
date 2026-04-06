@@ -217,6 +217,31 @@ create trigger trg_verifica_funcionario_projeto
 before insert on engineer04.projetos
 for each row execute function engineer04.verifica_funcionario_projeto();
 
+-- Tentativa de inserir projeto sem funcionário associado
+insert into engineer04.projetos (id_projeto, nome_projeto, func_id)
+values (6008, 'Pipeline de Integração de Dados', null);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 -- Qual a Diferença Entre Stored Procedure e Function?
 
