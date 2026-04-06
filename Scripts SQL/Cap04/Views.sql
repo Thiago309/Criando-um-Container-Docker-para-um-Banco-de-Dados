@@ -91,7 +91,7 @@ SELECT * from engineer04.vw_detalhes_funcionarios
 
 
 -- View para retornar funcionários alocados em projetos
-create VIEW engineer04.vw_funcionarios_projetos as
+create view engineer04.vw_funcionarios_projetos as
 with FuncionariosProjetos as (
     select 
         f.id_funcionario,
@@ -162,7 +162,8 @@ select * from engineer04.vw_funcionarios_projetos
 refresh materialized view engineer04.mv_funcionarios_projetos;
 
 
--- 							[STORAGE PROCEDURE]
+-- 			  		[STORED PROCEDURE] - PROGRAMAÇÃO DE BANCO DE DADOS
+
 
 -- SP que retorna o salário de cada funcionário com aumento de 5%
 create or replace procedure engineer04.aumenta_salario()
@@ -184,17 +185,67 @@ CALL engineer04.aumenta_salario();
 
 
 
+-- 							[FUNCTION] - FUNÇÕES
+
+-- Função que vai verificar se um projeto está sendo cadastrado sem funcionário associado
+create or replace function engineer04.verifica_funcionario_projeto()
+returns trigger as $$
+begin
+    -- verifica se o id do funcionário associado ao projeto é nulo
+    if new.func_id is null then
+        raise exception 'não é permitido inserir um projeto sem um funcionário associado.';
+    end if;
+    return new;
+end;
+$$ language plpgsql;
 
 
 
+-- 			  				[TRIGGERS] - GATILHOS
 
 
+/*
+Um Trigger (ou Gatilho) é um tipo especial de rotina ou procedimento no banco de dados que
+é acionado (executado) automaticamente sempre que um evento específico ocorre em uma 
+tabela ou view. Diferente de uma Stored Procedure que você precisa chamar manualmente com
+um comando CALL, o Trigger fica "escutando" a tabela. Se alguém fizer um INSERT (inserir), 
+UPDATE (atualizar) ou DELETE (deletar) naquela tabela, o Trigger "dispara" e executa a sua
+lógica.
+*/
+
+create trigger trg_verifica_funcionario_projeto
+before insert on engineer04.projetos
+for each row execute function engineer04.verifica_funcionario_projeto();
 
 
+-- Qual a Diferença Entre Stored Procedure e Function?
 
+-- 1. Propósito e Uso:
 
+-- Stored Procedure: Geralmente usada para realizar um conjunto de operações no banco de dados, 
+-- como inserções, atualizações, deleções e consultas complexas. Pode ou não retornar um valor.
 
+-- Function: Projetada para calcular e retornar um valor. 
+-- É frequentemente usada em consultas SQL para realizar cálculos, formatar dados, etc.
 
+-- 2. Retorno de Valores:
+
+-- Stored Procedure: Pode retornar zero, um ou vários valores (através de parâmetros OUT ou conjuntos 
+-- de resultados).
+
+-- Function: Sempre retorna um único valor. Não pode retornar múltiplos conjuntos de resultados.
+
+-- 3. Uso em SQL:
+
+-- Stored Procedure: Não pode ser utilizada diretamente em instruções SQL como SELECT, WHERE, etc.
+
+-- Function: Pode ser incorporada em instruções SQL.
+
+-- 4. Natureza:
+
+-- Stored Procedure: Mais procedimental, ideal para executar sequências de comandos e lógicas complexas.
+
+-- Function: Mais funcional, concentrada em cálculos ou operações de dados.
 
 
 
