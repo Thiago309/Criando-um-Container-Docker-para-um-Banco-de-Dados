@@ -310,7 +310,3 @@ CREATE INDEX idx_salario ON cap04.funcionarios (salario);
 
 -- DROP
 DROP INDEX cap04.idx_funcionarios_id;
-
-
-
-
