@@ -259,10 +259,38 @@ where nome = 'Machado de Assis';
 select * from engineer04.historico_salarios;
 
 
+-- 			  			 [COMMIT & ROLLBACK] - Controle de Transações
 
+/*
+Uma transação é um bloco de comandos SQL que deve ser tratado como uma unidade 
+única de trabalho. A regra de ouro aqui é o conceito de Atomicidade (o "Tudo ou 
+Nada"): ou todos os comandos do bloco funcionam e são salvos, ou, se apenas um 
+falhar, absolutamente nada é salvo.
 
+COMMIT: É o comando que diz ao banco de dados: "Tudo ocorreu bem. Salve todas as
+alterações feitas nesta transação permanentemente no disco."
 
+ROLLBACK: É o comando de emergência que diz: "Algo deu errado ou eu desisti. 
+Desfaça todas as alterações feitas desde o início desta transação e volte ao 
+estado original."
+*/
 
+-- Início da transação
+begin;
+
+-- inserindo um novo funcionário
+insert into engineer04.funcionarios (id_funcionario, nome, departamento, data_contratacao, salario)
+values (106, 'Jorge Amado', 'Desenvolvimento', '2024-01-01', 15000.00);
+
+-- Tentativa de inserir um projeto associado ao funcionário
+insert into engineer04.projetos (id_projeto, nome_projeto, func_id)
+values (7777, 'Projeto Alpha', 106);
+
+-- Commit ou Rollback
+commit;
+-- rollback; --em caso de erro ou necessidade de desfazer as operações
+
+select * from engineer04.funcionarios
 
 
 
